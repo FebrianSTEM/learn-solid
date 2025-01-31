@@ -219,6 +219,92 @@ public class ContractEmployee : Employee
 
 > **“Clients should not be forced to depend on interfaces they do not use”**
 
+Let's say the requirement required us to make a flying car, so we made this IVehicle Interface which contain Drive and Fly Method to be implemented in Flying Car.
+
+```csharp
+public interface IVehicle
+{
+    void Drive();
+    
+    void Fly();
+    
+}
+
+//Class implemented IVehicle
+public class FlyingCar : IVehicle
+{
+    public void Drive()
+    {
+        Console.WriteLine("its drive ooo !");
+    }
+    
+    public void Fly()
+    {
+        Console.WriteLine("its flying ooo !");
+    }
+}
+
+```
+Then sometimes later, it is required us to make another vehicle which is an ordinary no flying car.
+
+Then the problem is by using IVehicle we are forced to implemented this ordinary no flying car to be fly and it is violated ISP.
+
+```csharp
+//RegularCar Class implemented IVehicle
+public class RegularCar : IVehicle
+{
+    public void Drive()
+    {
+        Console.WriteLine("its drive ooo !");
+    }
+    
+    public void Fly()
+    {
+        throw new NotImplementedException();
+    }
+}
+```
+
+To Solve this we can refacator the code by divided each function of the vehicle to each individual interfaces such below
+
+```csharp
+
+public interface IDrive
+{
+    void Drive();   
+}
+
+public interface IFly
+{
+    void Fly();
+}
+```
+
+```csharp
+public class RegularCar : IDrive
+{
+    public void Drive()
+    {
+        Console.WriteLine("its drive ooo !");
+    }
+}
+```
+
+```csharp
+public class FlyingCar : IDrive, IFly
+{
+    public void Drive()
+    {
+        Console.WriteLine("its drive ooo !");
+    }
+    
+    public void Fly()
+    {
+        Console.WriteLine("its flying ooo !");
+    }
+}
+```
+
 ---
 
 # <a name=DIP>InterfaceDependency Inversion Principle (DIP)</a>
@@ -226,4 +312,69 @@ public class ContractEmployee : Employee
 
 > **“High-level modules should not depend on low-level modules. Both should depend on abstractions”**
 
+Example:
+
+```csharp
+//High Level Class
+public class DataAccessLayer
+{
+    public void AddCustomer(string Name)
+    {
+        //add customer to the database
+        FileLogger = logger = new FileLogger(); // FileLogger is Lower Level Class
+        logger.Log($"Customer Added : {name}")
+    }
+}
+```
+
+it's violating DIP because, DataAccessLayer Class dependent to FileLogger class, it could be resolve using depedency Injection.
+
+```csharp
+//High Level Class
+public class DataAccessLayer
+{
+    public void AddCustomer(string Name)
+    {
+        //add customer to the database
+        FileLogger = logger = new FileLogger(); // FileLogger is Lower Level Class
+        logger.Log($"Customer Added : {name}")
+    }
+}
+```
+Create Interface for Logger
+
+```csharp
+public interface ILogger
+{
+    void Log(string message);
+}
+
+public class FileLogger : ILogger
+{
+    public void Log(string message)
+    {
+        // Write Message to log file
+    }
+}
+```
+Inject DataAccessLayer Class
+
+```csharp
+//High Level Class
+public class DataAccessLayer
+{
+    private ILogger _logger;
+    
+    public DataAccessLayer(Ilogger logger)
+    {
+        _logger = logger;
+    }
+
+    public void AddCustomer(string Name)
+    {
+        //add customer to the database
+        _logger.Log($"Customer Added : {name}")
+    }
+}
+```
 ---
