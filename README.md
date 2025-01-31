@@ -278,7 +278,7 @@ public interface IFly
 {
     void Fly();
 }
----
+```
 
 ```csharp
 public class RegularCar : IDrive
@@ -305,9 +305,76 @@ public class FlyingCar : IDrive, IFly
 }
 ```
 
+---
+
 # <a name=DIP>InterfaceDependency Inversion Principle (DIP)</a>
 
 
 > **“High-level modules should not depend on low-level modules. Both should depend on abstractions”**
 
+Example:
+
+```csharp
+//High Level Class
+public class DataAccessLayer
+{
+    public void AddCustomer(string Name)
+    {
+        //add customer to the database
+        FileLogger = logger = new FileLogger(); // FileLogger is Lower Level Class
+        logger.Log($"Customer Added : {name}")
+    }
+}
+```
+
+it's violating DIP because, DataAccessLayer Class dependent to FileLogger class, it could be resolve using depedency Injection.
+
+```csharp
+//High Level Class
+public class DataAccessLayer
+{
+    public void AddCustomer(string Name)
+    {
+        //add customer to the database
+        FileLogger = logger = new FileLogger(); // FileLogger is Lower Level Class
+        logger.Log($"Customer Added : {name}")
+    }
+}
+```
+Create Interface for Logger
+
+```csharp
+public interface ILogger
+{
+    void Log(string message);
+}
+
+public class FileLogger : ILogger
+{
+    public void Log(string message)
+    {
+        // Write Message to log file
+    }
+}
+```
+Inject DataAccessLayer Class
+
+```csharp
+//High Level Class
+public class DataAccessLayer
+{
+    private ILogger _logger;
+    
+    public DataAccessLayer(Ilogger logger)
+    {
+        _logger = logger;
+    }
+
+    public void AddCustomer(string Name)
+    {
+        //add customer to the database
+        _logger.Log($"Customer Added : {name}")
+    }
+}
+```
 ---
